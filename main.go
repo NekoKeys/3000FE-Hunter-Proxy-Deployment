@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 type ProxyRequest struct {
@@ -14,8 +13,6 @@ type ProxyRequest struct {
 }
 
 func proxyRequest(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-
 	var p ProxyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&p)
@@ -23,9 +20,6 @@ func proxyRequest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	duration := time.Since(start)
-	fmt.Println(duration)
 
 	client := &http.Client{}
 
@@ -37,21 +31,9 @@ func proxyRequest(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	duration = time.Since(start)
-	fmt.Println(duration)
-
 	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
 
-	duration = time.Since(start)
-	fmt.Println(duration)
-
-	fmt.Fprintf(w, "%s", bodyString)
-
-	fmt.Println("Endpoint Hit: homePage")
-	duration = time.Since(start)
-	fmt.Println(duration)
-
+	fmt.Fprintf(w, "%s", string(body))
 }
 
 func handleRequests() {
